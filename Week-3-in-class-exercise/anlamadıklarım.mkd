@@ -1,0 +1,38 @@
+1. __name__: Modülün Kimlik Kontrolü
+Daha önce konuştuğumuz gibi, __name__ bir dosyanın "ana patron" (Top-Level) mı yoksa bir "hizmetçi" (Imported Module) mi olduğunu belirler.
+
+Neden Önemli? Eğer bir dosyayı kütüphane olarak kullanacaksan, o dosyanın içindeki kodların sen istemeden çalışmasını engeller.
+
+Bağlantı: Bu, kodun "Kapsüllenmesi" (Encapsulation) ile ilgilidir. Sadece ihtiyacın olan fonksiyonları dışarıya açarsın.
+
+2. Dependency Injection (Bağımlılık Enjeksiyonu)
+"Injection" denildiğinde yazılım mimarisinde genellikle Dependency Injection (DI) kastedilir. Bu, bir sınıfın veya fonksiyonun ihtiyaç duyduğu nesneleri (bağımlılıkları) kendi içinde yaratmak yerine, dışarıdan (parametre olarak) ona "enjekte" edilmesidir.
+
+Örnekle açıklayalım:
+Diyelim ki bir Animal nesnen var ve bu hayvanın bir SesCihazi (Hoparlör) kullanarak ses çıkarmasını istiyorsun.
+
+Injection Olmadan (Kötü Tasarım): Hayvanın içinde "Benim ses cihazım sadece şu marka hoparlör olsun" diye kod yazarsın. Yarın hoparlörü değiştirmek istersen tüm sınıfı baştan yazman gerekir.
+
+Injection İle (İyi Tasarım): Hayvana "Sen ses çıkarırken sana hangi hoparlörü verirsem onu kullan" dersin. Hayvan yaratılırken ona istediğin cihazı parametre olarak gönderirsin.
+
+3. Bu İkisinin Kesişim Noktası: Esneklik
+Bu terimleri birleştiren şey, **"Yazılım Tasarım Kararları"**dır.
+
+__name__ == "__main__" kullanarak kodunu bağımsız bir parça haline getirirsin.
+
+Injection kullanarak o parçayı her türlü senaryoya uyumlu (başka nesnelerle çalışabilir) hale getirirsin.
+
+STM32/VHDL Mantığıyla Bir Örnek:
+
+Bir UART modülü yazdığını düşün (Class).
+
+__name__ kontrolü: Bu modülü tek başına test etmek istediğinde (Simulation/Testbench) içindeki test kodları çalışır. Ama ana projene dahil ettiğinde (Import) sadece UART mantığı çalışır.
+
+Injection: Modüle "Hangi Baud Rate'de çalışacağını ben sana dışarıdan söyleyeceğim" demek bir enjeksiyondur. Modülün içinde Baud Rate'i sabitlersen (Hardcode), o modül esnekliğini kaybeder.
+
+4. Güvenlik Notu: "SQL/Command Injection"
+Eğer duyduğun terim bir güvenlik açığı olan "Injection" ise (SQL Injection gibi), bu tamamen farklı bir durumdur. Bu, kullanıcıdan gelen zararlı bir kodun (enjektörün), senin programının içine sızıp veritabanını ele geçirmesidir. Profesyonel yazılımcılar, Pydantic gibi doğrulama araçlarını kullanarak bu tür sızıntıları (injection) engeller.
+
+Özetle: __name__ dosyanın nerede çalıştığını, Injection ise nesnelerin nasıl birbirine bağlandığını yönetir.
+
+Bu kavramlar birleştiğinde ortaya çıkan "Sınıf Miras Alma" (Inheritance) konusuna, yani bir Animal sınıfından Dog sınıfı "enjekte etmeye" (türetmeye) hazır mısın? İstersen bu bağlantıyı kod üzerinde somutlaştırabiliriz.

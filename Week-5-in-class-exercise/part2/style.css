@@ -1,0 +1,94 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f4f8;
+    /* Soft background to contrast the vibrant blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.calculator-container {
+    padding: 2rem;
+}
+
+.calculator {
+    background-color: #0078D7;
+    /* The exact blue background */
+    padding: 10px;
+    width: 440px; /* Widened to fit 5 columns comfortably */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    /* Light shadow for presentation */
+}
+
+.display {
+    background-color: white;
+    color: black;
+    font-size: 3rem;
+    text-align: right;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    height: 80px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    overflow: hidden;
+}
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Upgraded to 5 columns */
+    gap: 8px;
+    /* Gap to expose the blue background */
+}
+
+.btn {
+    border: none;
+    font-size: 1.5rem; /* Slightly reduced font size to fit extra width */
+    font-weight: 600;
+    color: white;
+    background-color: #7A7A7A;
+    /* Darker gray for numbers like 0-9 and . */
+    cursor: pointer;
+    height: 60px; /* Slightly shorter to fit full 5x5 grid elegantly */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.1s;
+}
+
+.btn:active {
+    background-color: #5c5c5c;
+}
+
+.btn.scientific {
+    background-color: #8c8c8c; /* Slightly lighter than number keys */
+}
+
+.btn.scientific:active {
+    background-color: #707070;
+}
+
+.btn.operator {
+    background-color: #999999;
+    /* Lighter gray for ÷, x, - , + */
+}
+
+.btn.operator:active {
+    background-color: #888888;
+}
+
+.btn.operator.equals {
+    background-color: #005A9E;
+    /* Distinct darker blue for = */
+}
+
+.btn.operator.equals:active {
+    background-color: #004578;
+}

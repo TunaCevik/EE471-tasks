@@ -1,0 +1,5 @@
+
+class Animal()
+
+__str__: Noe the dunder str method tells python how Python should print an object of type animal. If we do not use it
+Python would defalut to the srt method of the generic Python object, which jus tells us the memory location this object has been created at, whic is not very useful

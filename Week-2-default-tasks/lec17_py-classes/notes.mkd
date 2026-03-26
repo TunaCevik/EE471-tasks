@@ -1,0 +1,197 @@
+create object type every one have blue print
+
+data representation (primitive or composite)
+
+1234 is an nistance of an int
+
+"hello" is an instance of a str
+
+OOP
+Pythong create new objects, monipulate object, destroy them
+
+Objects are a data abstraction that captures
+(1) An internal representation Bu obje hangi verilerden oluşuyor?
+* Through data attributes
+(2) An interface for interaction with object Diğer programcılar (veya kodun diğer kısımları) bu objeyi nasıl kullanacak?
+* Through methods (aka procedures/functions)
+* Defines behaviour but hides implementation (stack LIFO, FIFO hepsi list ama design'ı farklı)
+---
+
+1. "Bundle data into packages..." (Veriyi ve fonksiyonları tek pakette toplamak)
+C dilinde veya Assembly'de veriler (değişkenler) bir yerde, fonksiyonlar başka bir yerdedir. OOP ise bunları "Kapsüller".
+
+Donanım Örneği: Bir LoadCell devresi düşün. Bu devrenin verileri (kalibrasyon değeri, offset değeri, okunan ham ADC değeri) ve fonksiyonları (dara_al(), agirlik_hesapla()) vardır. OOP sayesinde sen LoadCell adında bir sınıf (class) yaratırsın. Artık o sensörle ilgili her şey o paketin içindedir. Ortalıkta başıboş gezen değişkenler olmaz.
+
+2. "Divide-and-conquer development" (Böl-ve-Yönet geliştirme / Modülerlik)
+Büyük bir projeyi küçük, bağımsız modüllere ayırarak çözmektir. "Implement and test behavior of each class separately" maddesi tam olarak VHDL'deki mantıkla aynıdır.
+
+VHDL Örneği: Bir FPGA tasarımında davranışsal (behavioral) bir testbench yazarken, tüm sistemi tek seferde test etmezsin. Önce UART modülünü yazar test edersin, sonra bellek modülünü test edersin.
+
+Yazılım Örneği: Rumba ritim projesinde "Sinyal Okuyucu" sınıfını ayrı, "Filtreleyici" sınıfını ayrı yazarsın. Eğer filtre çalışmazsa, hatayı sinyal okuyucu kodlarında aramana gerek kalmaz. Çünkü her biri kapalı birer kutudur, karmaşıklık azalır ("Increased modularity reduces complexity").
+
+3. "Each class has a separate environment (no collision...)" (İsim Çatışmalarını Önleme)
+C gibi prosedürel dillerde, aynı isimde iki fonksiyon yazamazsın.
+
+Örnek: Hem bir Motoru hem de bir Timer'ı (Zamanlayıcıyı) durduran kodlar yazacaksın. C'de bunlara mecburen motor_stop() ve timer_stop() gibi uzun isimler vermek zorundasın.
+
+OOP'de: Motor ve Timer ayrı sınıflar (ayrı dünyalar/environment) olduğu için, ikisinin içine de sadece stop() metodunu yazabilirsin. Kodda motor.stop() ve timer.stop() dediğinde Python hangisini kastettiğini bilir ve isimler asla "çarpışmaz" (collision).
+
+4. "Inheritance allows subclasses to redefine or extend..." (Miras Alma ve Kodu Yeniden Kullanma)
+İşte OOP'nin en büyük güçlerinden biri budur. Sıfırdan kod yazmak yerine, var olan bir şablonun özelliklerini miras alıp (Inheritance) sadece ihtiyacın olan yeri değiştirebilirsin (redefine/extend).
+
+Sinyal İşleme Örneği: Dijital sinyal işleme alanında algoritmalar geliştiriyorsun. Önce TemelFiltre adında bir ana sınıf (superclass) yazarsın. Bu sınıfın içinde sinyali diziye alma, örnekleme frekansını tutma gibi genel kodlar bulunur.
+
+Daha sonra bir KalmanFiltresi ve WienerFiltresi adında iki alt sınıf (subclass) oluşturursun. Bu alt sınıflar TemelFiltre'nin tüm özelliklerini miras alır (baştan yazmana gerek kalmaz). Sen sadece bu alt sınıfların içindeki "matematiksel hesaplama" metodunu kendi içlerinde yeniden tanımlarsın (redefine). Kodu devasa oranda yeniden kullanmış (reuse) olursun.
+---
+1. Behavior (Davranış / Arayüz) Farkı
+Davranış, dışarıdan bakan birinin (veya başka bir kodun) bu yapıyı nasıl gördüğü ve kullandığıdır. İkisinin davranışı birbirinin tam tersidir:
+
+FIFO (First-In, First-Out) - Kuyruk (Queue): * Davranış: İlk gelen ilk çıkar.
+
+PDF Örneği: Bir mağazadaki kasa sırası. İlk gelen müşteri ilk hizmeti alır.
+
+Mühendislik Örneği: UART haberleşmesindeki "Buffer". Bilgisayardan mikrokontrolcüye gelen byte'ları sıraya dizersin. İlk gelen byte'ı ilk okuman gerekir, aksi takdirde veri bozulur.
+
+LIFO (Last-In, First-Out) - Yığın (Stack): * Davranış: Son gelen ilk çıkar.
+
+PDF Örneği: Bir krep (pancake) yığını. İlk yapılan krep en altta kalır, en son yapılan en üste konur ve yenmeye en üsttekinden (en son yapılandan) başlanır.
+
+Mühendislik Örneği: ARM işlemcilerde bir "Interrupt" (kesme) geldiğinde, işlemci o anki register değerlerini RAM'de bir "Stack" (LIFO) içine atar. Kesme bitince de kaldığı yere dönmek için en son attığı veriyi ilk olarak geri çeker (Push/Pop mantığı).
+
+2. Design (İç Tasarım / Internal Representation) Benzerliği
+İşin en büyüleyici kısmı burasıdır. Davranışları bu kadar farklı olmasına rağmen, OOP mantığıyla her ikisini de tamamen aynı iç tasarımı kullanarak üretebilirsin.
+
+Sunumda bu durum harika açıklanmış: Her ikisi de arka planda sadece standart bir Python Listesi (list) kullanılarak tasarlanabilir.
+
+FIFO (Queue) Tasarımı:
+
+Veriyi bir liste (isim listesi) olarak tutarsın.
+
+Yeni geleni listenin sonuna eklersin (Append).
+
+Çıkacak olanı listenin en başından (0. indeks) silersin.
+
+LIFO (Stack) Tasarımı:
+
+Veriyi yine bir liste olarak tutarsın.
+
+Yeni geleni listenin sonuna eklersin (Append).
+
+Çıkacak olanı listenin en sonundan silersin.
+
+---
+Make a distinciton between creating a class and using an instance of the class
+
+
+Can create instances of a Coordinate object
+(3,4) (1,1)
+Decide what data elements constitute an object in a 2D plane
+A coordinate is defined by x and y value
+
+Decide what to do with coordinates
+Tell us how far away the coordinate is on the x or y axex
+Meausre the distance between two coordinatates, Pythagoras
+ 
+---
+What are the attributes
+data and procedures that "belong" to the class
+Data attributes
+Methods (procedural attributes)
+
+Harika bir soru! Bu detay, Nesne Yönelimli Programlamayı (OOP) öğrenen herkesin ilk başta kafasını karıştıran ama mantığını kavrayınca "Aha!" dedirten o meşhur noktadır.
+
+Bunun arkasında yatan sebep tamamen **tasarım tercihi** ve **geçici veri ile kalıcı hafıza** arasındaki farkı göstermektir.
+
+Olayı bir kargo teslimatı ve donanım mantığıyla iki şekilde inceleyelim:
+
+### 1. Kargo Kuryesi ve Depo Rafı Analojisi
+
+* **`xval` (Kurye):** Dışarıdan gelen geçici bir taşıyıcıdır (parametredir). Sen `c = Coordinate(3, 4)` dediğinde, `xval` isimli kurye eline `3` değerini alır ve `__init__` fonksiyonunun (deponun) kapısından içeri girer. Kuryenin işi paketi teslim edince biter ve fonksiyondan çıkınca kurye kaybolur.
+* **`self.x` (Kalıcı Raf):** Bu, senin objenin içindeki kalıcı hafızadır (Data Attribute).
+* **`self.x = xval` (Teslimat İşlemi):** "Kuryenin (`xval`) getirdiği `3` değerini al ve depodaki `x` isimli kalıcı rafa (`self.x`) koy." demektir.
+
+### 2. Peki `self.xval = xval` Yazsaydık Ne Olurdu?
+
+Python sana hiçbir hata vermezdi! Kod tamamen kusursuz çalışırdı. **Ama** objeyi dışarıdan kullanmak istediğinde şöyle bir gariplik olurdu:
+
+```python
+# Eğer self.xval = xval yazsaydın:
+c = Coordinate(3, 4)
+print(c.xval)  # Ekrana 3 yazardı
+
+```
+
+Matematiksel ve mühendislik açısından düşün: Bir koordinat sisteminde noktaların "x değeri" (`xval`) diye bir ismi mi vardır, yoksa sadece "x" ve "y" eksenleri mi vardır?
+
+Bir objeyi tasarlarken dışarıdan onu kullanacak kişiye **temiz ve mantıklı bir arayüz** sunmak istersin. `c.x` yazmak, `c.xval` yazmaktan çok daha doğal ve okunaklıdır.
+
+### 3. MIT Hocası Neden Böyle Yazdı? (Eğitimsel Sebep)
+
+Eğer hoca kodu şöyle yazsaydı:
+
+```python
+def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+```
+
+Öğrenciler haklı olarak şu yanılgıya düşecekti: *"Hımm, demek ki parametre ismiyle `self`'in yanına yazdığımız isim aynı olmak ZORUNDA."*
+
+İşte hoca, parametre isimleri (`xval`, `yval`) ile objenin içindeki kalıcı değişken isimlerinin (`self.x`, `self.y`) **birbirinden tamamen bağımsız iki farklı şey olduğunu** kanıtlamak için bilerek farklı isimler seçti.
+
+### Donanım (Gömülü Sistem) Karşılığı
+
+Bir mikrodenetleyicide (örneğin STM32) dışarıdan gelen bir sinyali okuyup içerideki bir register'a yazdığını düşün:
+
+* `xval`: Dışarıdaki sensörden gelen anlık voltaj pini (`Pin_A0`).
+* `self.x`: O voltaj değerini kalıcı olarak sakladığın hafıza bölgesi (`ADC_Register_1`).
+
+Bu "geçici taşıyıcı" (parametre) ve "kalıcı depo" (attribute) mantığı zihninde oturdu mu? İstersen bu kalıcı depodaki verileri (yani `self.x`'i) kullanarak, dünkü slaytta geçen o mesafeyi ölçen `distance` metodunu nasıl yazacağımıza geçebiliriz.
+
+There can be many class instances using the sam blueprint.
+
+### BIG IDEA
+WHen defing a class we don't have an actual tangible object here. It's only a definition.
+
+c = coordinate(3,4)
+origin = Coordinate(0,0)
+
+### Vısualizing Instances
+In memory
+IW ve got a name bound to some object. And this object has its own x value and its own y value. 
+all right, well eher' a name c, well it's also bound to an object of type coordinate.
+c = Coordinate (3,4)
+
+c.x Hey what the of c and its says, oh it's a coordinate object. Does coordinate object have data attribute named x? yes, it does, because it looks at the init And then it says well, what's its value? it is three then it just returns that.
+
+## Visualizing invocation
+Coordinate calss is an object in memory
+ * From the class definition
+
+Create two Coordinate objects
+c= Coordinate(3,4)
+orig = Coordinate(0,0)
+
+* Evalutate the method call
+c.distance(orig)
+(1) The object is before the dot
+(2) Looks up the type of c
+(3) the method to call is after the dot.
+(4) Finds the binding for distance in that object class
+(5) Invokes that method with c as self and orig as other
+
+
+* Conventional way
+c = Coordintae(3,4)
+zero = Coordinate(0,0)
+c.distance(zero)
+c is object to call method on, this is self in the class def
+distance name of method
+parameters not inculingd self (self is implied to be c)
+* Equivalten to
+c = Coordintate(3,4)
+zero = Coordinate(0,0)
+Coordinate.distance(c, zero)
+Coordinate (name of class NOT an object of type Coordinate)
+distance name of method

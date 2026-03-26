@@ -1,0 +1,11 @@
+Edited index.html
+Edited style.css
+Edited script.js
+
+I have successfully created the three files for your calculator web app: [index.html](cci:7://file:///home/tunac/projects-for-university/EE471/Week-5-in-class-exercise/part2/index.html:0:0-0:0), [style.css](cci:7://file:///home/tunac/projects-for-university/EE471/Week-5-in-class-exercise/part2/style.css:0:0-0:0), and [script.js](cci:7://file:///home/tunac/projects-for-university/EE471/Week-5-in-class-exercise/part2/script.js:0:0-0:0). You can open the [index.html](cci:7://file:///home/tunac/projects-for-university/EE471/Week-5-in-class-exercise/part2/index.html:0:0-0:0) file in any web browser to see and interact with your calculator.
+
+Here is a summary of the features and design implemented:
+- **Layout Requirements**: The exact grid structure you requested is perfectly replicated using CSS Grid for exact alignment.
+- **Modern Design**: The user interface relies on a "glassmorphism" aesthetic with a semi-transparent blur effect backed by a subtle glowing orb. I've used modern dynamic hover/active states to ensure the application feels premium.
+- **Functionality**: The Javascript securely handles operations (+, -, x, ÷) and safely tracks decimal inputs to prevent duplicate decimals in a single number. It rounds calculations to 10 decimal places to eliminate common Javascript floating-point rounding errors.
+- **Bonus Feature**: I added full keyboard support so you can use your Numpad or number keys along with `Enter` (for `=`), `Escape` (to clear everything), and `Backspace` to delete the last typed digit.

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <meta name="description" content="A beautiful and functional scientific calculator.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator">
+            <div class="display" id="display">0</div>
+            <div class="buttons-grid">
+                <!-- Row 1 -->
+                <button class="btn scientific" onclick="computeSingleTarget('sin')">sin</button>
+                <button class="btn scientific" onclick="computeSingleTarget('cos')">cos</button>
+                <button class="btn scientific" onclick="computeSingleTarget('tan')">tan</button>
+                <button class="btn scientific" onclick="computeSingleTarget('log')">log</button>
+                <button class="btn scientific" onclick="computeSingleTarget('ln')">ln</button>
+
+                <!-- Row 2 -->
+                <button class="btn scientific" onclick="computeSingleTarget('sqrt')">√</button>
+                <button class="btn" onclick="appendNumber('7')">7</button>
+                <button class="btn" onclick="appendNumber('8')">8</button>
+                <button class="btn" onclick="appendNumber('9')">9</button>
+                <button class="btn operator" onclick="chooseOperation('÷')">÷</button>
+                
+                <!-- Row 3 -->
+                <button class="btn scientific" onclick="chooseOperation('^')">x^y</button>
+                <button class="btn" onclick="appendNumber('4')">4</button>
+                <button class="btn" onclick="appendNumber('5')">5</button>
+                <button class="btn" onclick="appendNumber('6')">6</button>
+                <button class="btn operator" onclick="chooseOperation('x')">x</button>
+                
+                <!-- Row 4 -->
+                <button class="btn scientific" onclick="appendConstant('π')">π</button>
+                <button class="btn" onclick="appendNumber('1')">1</button>
+                <button class="btn" onclick="appendNumber('2')">2</button>
+                <button class="btn" onclick="appendNumber('3')">3</button>
+                <button class="btn operator" onclick="chooseOperation('-')">-</button>
+                
+                <!-- Row 5 -->
+                <button class="btn scientific" onclick="appendConstant('e')">e</button>
+                <button class="btn" onclick="appendNumber('0')">0</button>
+                <button class="btn" onclick="appendNumber('.')">.</button>
+                <button class="btn operator equals" onclick="compute()">=</button>
+                <button class="btn operator" onclick="chooseOperation('+')">+</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
