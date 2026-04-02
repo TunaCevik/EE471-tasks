@@ -15,12 +15,65 @@
             <p>Powered by Azure Cognitive Services</p>
         </header>
         <main id="app-content">
-            <!-- Content will be injected here via conflicts -->
-            <p class="placeholder-text">Select a feature branch to begin.</p>
+            <div id="tts-section" class="feature-section">
+                <h2>Text-to-Speech</h2>
+                <div class="form-group">
+                    <label for="tts-input">Enter text to convert to speech:</label>
+                    <textarea id="tts-input" rows="4" placeholder="Hello, class!"></textarea>
+                </div>
+                <div class="form-group">
+                    <button id="btn-synthesize">🎤 Synthesize Speech</button>
+                </div>
+                
+                <div id="tts-alert" class="alert"></div>
+                
+                <div id="tts-audio-container" class="audio-player-container" style="display: none;">
+                    <label>Generated Audio:</label>
+                    <audio id="tts-audio-player" controls></audio>
+                </div>
+            </div>
         </main>
     </div>
     <script>
-        // Main javascript scope
+        document.getElementById('btn-synthesize').addEventListener('click', async () => {
+            const text = document.getElementById('tts-input').value;
+            const alertBox = document.getElementById('tts-alert');
+            const audioContainer = document.getElementById('tts-audio-container');
+            const audioPlayer = document.getElementById('tts-audio-player');
+            
+            if (!text.trim()) {
+                alertBox.textContent = 'Please enter some text.';
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({text: text})
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const audioUrl = URL.createObjectURL(blob);
+                    audioPlayer.src = audioUrl;
+                    audioContainer.style.display = 'block';
+                    
+                    alertBox.textContent = '✓ Speech synthesized successfully!';
+                    alertBox.className = 'alert success';
+                    alertBox.style.display = 'block';
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Server error');
+                }
+            } catch (error) {
+                alertBox.textContent = 'Error: ' + error.message;
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
