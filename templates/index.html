@@ -15,12 +15,67 @@
             <p>Powered by Azure Cognitive Services</p>
         </header>
         <main id="app-content">
-            <!-- Content will be injected here via conflicts -->
-            <p class="placeholder-text">Select a feature branch to begin.</p>
+            <div id="stt-section" class="feature-section">
+                <h2>Speech-to-Text</h2>
+                <div class="form-group">
+                    <label for="stt-file">Upload audio to convert to text (.wav):</label>
+                    <input type="file" id="stt-file" accept=".wav">
+                </div>
+                <div class="form-group">
+                    <button id="btn-transcribe">📄 Transcribe Audio</button>
+                </div>
+                
+                <div id="stt-alert" class="alert"></div>
+                
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label>Transcription:</label>
+                    <textarea id="stt-output" rows="6" readonly placeholder="Transcription will appear here..."></textarea>
+                </div>
+            </div>
         </main>
     </div>
     <script>
-        // Main javascript scope
+        document.getElementById('btn-transcribe').addEventListener('click', async () => {
+            const fileInput = document.getElementById('stt-file');
+            const alertBox = document.getElementById('stt-alert');
+            const outputArea = document.getElementById('stt-output');
+            
+            if (!fileInput.files.length) {
+                alertBox.textContent = 'Please select a .wav file first.';
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('audio', file);
+            
+            alertBox.textContent = 'Transcribing... please wait.';
+            alertBox.className = 'alert success';
+            alertBox.style.display = 'block';
+            outputArea.value = '';
+            
+            try {
+                const response = await fetch('/api/stt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    outputArea.value = data.text;
+                    alertBox.textContent = '✓ Audio transcribed successfully!';
+                    alertBox.className = 'alert success';
+                } else {
+                    throw new Error(data.error || 'Server error');
+                }
+            } catch (error) {
+                alertBox.textContent = 'Error: ' + error.message;
+                alertBox.className = 'alert error';
+            }
+        });
     </script>
 </body>
 </html>
