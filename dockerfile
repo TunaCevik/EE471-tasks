@@ -1,0 +1,33 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim-bullseye
+
+# Install system dependencies required for Azure Speech SDK
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libasound2 \
+    wget \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port Flask runs on
+EXPOSE 5000
+
+# Define environment variables (Can also be passed at runtime)
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+
+# Run the application
+CMD ["flask", "run"]

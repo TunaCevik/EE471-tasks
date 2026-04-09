@@ -1,0 +1,258 @@
+:root {
+    --bg-color: #0f172a;
+    --calc-bg: #1e3a8a; /* Deep blue background as requested */
+    --calc-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --screen-bg: #ffffff;
+    --screen-text: #0f172a;
+    
+    --btn-num-bg: #3b82f6; 
+    --btn-num-hover: #2563eb;
+    --btn-num-text: #ffffff;
+    
+    --btn-op-bg: #60a5fa;
+    --btn-op-hover: #3b82f6;
+    --btn-op-text: #ffffff;
+    
+    --btn-eq-bg: #f59e0b;
+    --btn-eq-hover: #d97706;
+    --btn-eq-text: #ffffff;
+    
+    --mic-bg: #64748b;
+    --mic-hover: #475569;
+    --mic-text: #ffffff;
+    --mic-recording: #ef4444;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: #f8fafc;
+    margin: 0;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, #60a5fa, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    color: #94a3b8;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.calculator {
+    background: var(--calc-bg);
+    padding: 20px;
+    border-radius: 24px;
+    box-shadow: var(--calc-shadow);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.calculator::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 100px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.display {
+    background: var(--screen-bg);
+    color: var(--screen-text);
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: right;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    overflow-x: auto;
+    white-space: nowrap;
+    min-height: 85px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.keypad-container {
+    display: flex;
+    gap: 15px;
+}
+
+.mic-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 10px;
+}
+
+.mic-btn {
+    background: var(--mic-bg);
+    color: var(--mic-text);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.mic-btn:hover {
+    background: var(--mic-hover);
+    transform: scale(1.05);
+}
+
+.mic-btn.recording {
+    background: var(--mic-recording);
+    animation: pulse 1.5s infinite;
+    transform: scale(1.1);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.mic-status {
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+}
+
+.keys-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.calc-btn {
+    border: none;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 15px 0;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    font-family: 'Inter', sans-serif;
+}
+
+.calc-btn:active {
+    transform: translateY(4px) !important;
+    box-shadow: 0 0 0 rgba(0,0,0,0.2);
+}
+
+.calc-btn.num {
+    background: var(--btn-num-bg);
+    color: var(--btn-num-text);
+}
+
+.calc-btn.num:hover {
+    background: var(--btn-num-hover);
+}
+
+.calc-btn.op {
+    background: var(--btn-op-bg);
+    color: var(--btn-op-text);
+}
+
+.calc-btn.op:hover {
+    background: var(--btn-op-hover);
+}
+
+.calc-btn.eq {
+    background: var(--btn-eq-bg);
+    color: var(--btn-eq-text);
+}
+
+.calc-btn.eq:hover {
+    background: var(--btn-eq-hover);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    display: none;
+    text-align: center;
+    font-weight: 500;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert.success {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.alert.error {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.controls-extra {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.secondary {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.secondary:hover {
+    background: #334155;
+    color: #f8fafc;
+}

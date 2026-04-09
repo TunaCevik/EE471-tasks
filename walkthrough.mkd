@@ -1,0 +1,54 @@
+# Voice-Activated Calculator Integration Walkthrough
+
+The project has been successfully completed according to the tasks defined for Mini-Project 2.
+
+## What was implemented
+
+### 1. Robust Voice Capture & Audio Conversion (`dockerfile` & `app.py`)
+- Browsers inherently use specific codecs like webm or ogg when using the MediaRecorder API natively, which conflicts with Azure SDK's strict WAV/PCM requirements.
+- We added the **`ffmpeg`** dependency to your `dockerfile` to handle this internally on the server side.
+- Your Flask application now automatically records, stores, and perfectly transcodes browser audio chunks before sending to the Azure SDK for transcription!
+
+### 2. The Calculator UI Interface (`templates/index.html` & `static/style.css`)
+- The UI from Mini-Project 1 has been re-created in high aesthetic fidelity, using a beautiful deep-blue theme, white text box output, and animated inputs resembling premium neumorphism guidelines.
+- **The Magic "Microphone"**: Placed on the main grid. When clicked, it activates your microphone securely and transcribes text via Azure STT endpoints, executing operations identically to normal input clicks!
+
+### 3. Execution Engine & TTS (`index.html` inline JS)
+- A highly accurate normalization engine converts word strings received from STT (like "Five plus two") or pure digit results ("5 + 2") directly into sequence simulated button clicks.
+- These buttons then execute calculation operations correctly.
+- Concurrently, each physical (or STT simulated) button click automatically queries the previously built `/api/tts` hook to speak its respective command (`1 -> One, + -> Plus`), and outputs spoken results.
+
+## Containerization Bonus
+The bonus Docker configuration has been fully fleshed out with the necessary OS-level installation steps. Your app can be run via:
+```bash
+docker-compose up --build
+```
+
+You are all set! I have committed the changes to your local Git branch as you requested, so you can execute `git push` on your end to publish your deliverables.
+# Voice-Activated Calculator Integration Walkthrough
+
+The project has been successfully completed according to the tasks defined for Mini-Project 2.
+
+## What was implemented
+
+### 1. Robust Voice Capture & Audio Conversion (`dockerfile` & `app.py`)
+- Browsers inherently use specific codecs like webm or ogg when using the MediaRecorder API natively, which conflicts with Azure SDK's strict WAV/PCM requirements.
+- We added the **`ffmpeg`** dependency to your `dockerfile` to handle this internally on the server side.
+- Your Flask application now automatically records, stores, and perfectly transcodes browser audio chunks before sending to the Azure SDK for transcription!
+
+### 2. The Calculator UI Interface (`templates/index.html` & `static/style.css`)
+- The UI from Mini-Project 1 has been re-created in high aesthetic fidelity, using a beautiful deep-blue theme, white text box output, and animated inputs resembling premium neumorphism guidelines.
+- **The Magic "Microphone"**: Placed on the main grid. When clicked, it activates your microphone securely and transcribes text via Azure STT endpoints, executing operations identically to normal input clicks!
+
+### 3. Execution Engine & TTS (`index.html` inline JS)
+- A highly accurate normalization engine converts word strings received from STT (like "Five plus two") or pure digit results ("5 + 2") directly into sequence simulated button clicks.
+- These buttons then execute calculation operations correctly.
+- Concurrently, each physical (or STT simulated) button click automatically queries the previously built `/api/tts` hook to speak its respective command (`1 -> One, + -> Plus`), and outputs spoken results.
+
+## Containerization Bonus
+The bonus Docker configuration has been fully fleshed out with the necessary OS-level installation steps. Your app can be run via:
+```bash
+docker-compose up --build
+```
+
+You are all set! I have committed the changes to your local Git branch as you requested, so you can execute `git push` on your end to publish your deliverables.

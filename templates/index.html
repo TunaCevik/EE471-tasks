@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Activated Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="main-container">
+        <header>
+            <h1>Voice Activated Calculator</h1>
+            <p>Speak to calculate, or press to hear</p>
+        </header>
+
+        <main id="app-content">
+            <div class="calculator">
+                <div class="display" id="display">0</div>
+                <div class="keypad-container">
+                    <div class="mic-section">
+                        <button id="mic-btn" class="mic-btn" title="Hold/Click to Record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+                                <path
+                                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+                            </svg>
+                        </button>
+                        <div id="mic-status" class="mic-status">Ready</div>
+                    </div>
+                    <div class="keys-section">
+                        <button class="calc-btn num" data-val="7">7</button>
+                        <button class="calc-btn num" data-val="8">8</button>
+                        <button class="calc-btn num" data-val="9">9</button>
+                        <button class="calc-btn op" data-val="/">÷</button>
+
+                        <button class="calc-btn num" data-val="4">4</button>
+                        <button class="calc-btn num" data-val="5">5</button>
+                        <button class="calc-btn num" data-val="6">6</button>
+                        <button class="calc-btn op" data-val="*">×</button>
+
+                        <button class="calc-btn num" data-val="1">1</button>
+                        <button class="calc-btn num" data-val="2">2</button>
+                        <button class="calc-btn num" data-val="3">3</button>
+                        <button class="calc-btn op" data-val="-">−</button>
+
+                        <button class="calc-btn num" data-val="0">0</button>
+                        <button class="calc-btn num" data-val=".">.</button>
+                        <button class="calc-btn eq" data-val="=">=</button>
+                        <button class="calc-btn op" data-val="+">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alert-box" class="alert"></div>
+
+            <div class="controls-extra">
+                <button id="clear-btn" class="secondary">Clear Memory</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data Mappings
+        const voiceMap = {
+            '0': 'Zero', '1': 'One', '2': 'Two', '3': 'Three',
+            '4': 'Four', '5': 'Five', '6': 'Six', '7': 'Seven',
+            '8': 'Eight', '9': 'Nine', '.': 'Point',
+            '/': 'Over', '*': 'Times', '+': 'Plus', '-': 'Minus',
+            '=': 'is'
+        };
+
+        const wordToCommand = {
+            'zero': '0', 'one': '1', 'two': '2', 'three': '3',
+            'four': '4', 'five': '5', 'six': '6', 'seven': '7',
+            'eight': '8', 'nine': '9', 'point': '.',
+            'over': '/', 'times': '*', 'plus': '+', 'minus': '-', 'is': '=',
+            'divided': '/', 'multiply': '*', 'multiplied': '*', 'equals': '='
+        };
+
+        const symbolMap = {
+            'x': '*', '÷': '/', '×': '*'
+        };
+
+        const display = document.getElementById('display');
+        const alertBox = document.getElementById('alert-box');
+        let currentExpression = '';
+        let pendingAudio = [];
+        let isPlaying = false;
+
+        function showAlert(msg, type) {
+            alertBox.textContent = msg;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+        }
+
+        // --- TTS Engine ---
+        async function playVoice(text) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const response = await fetch('/api/tts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: text })
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const audioUrl = URL.createObjectURL(blob);
+                        const audio = new Audio(audioUrl);
+                        audio.onended = () => resolve();
+                        audio.onerror = () => resolve(); // continue even if error
+                        audio.play();
+                    } else {
+                        resolve();
+                    }
+                } catch (error) {
+                    resolve();
+                }
+            });
+        }
+
+        async function queueVoice(text) {
+            pendingAudio.push(text);
+            if (!isPlaying) {
+                processAudioQueue();
+            }
+        }
+
+        async function processAudioQueue() {
+            if (pendingAudio.length === 0) {
+                isPlaying = false;
+                return;
+            }
+            isPlaying = true;
+            const text = pendingAudio.shift();
+            await playVoice(text);
+            processAudioQueue();
+        }
+
+        // --- Calculator Logic ---
+        function updateDisplay(val) {
+            display.textContent = val;
+        }
+
+        function handleKeyPress(val) {
+            if (val === '=') {
+                try {
+                    let result = eval(currentExpression);
+                    if (result === undefined) return;
+                    result = Math.round(result * 1000000) / 1000000; // handle float precision
+                    updateDisplay(result);
+                    currentExpression = result.toString();
+                    queueVoice(`is ${result}`);
+                } catch (e) {
+                    updateDisplay('Error');
+                    currentExpression = '';
+                }
+            } else if (val === 'C') {
+                currentExpression = '';
+                updateDisplay('0');
+            } else {
+                if (currentExpression === '0' && "0123456789".includes(val)) {
+                    currentExpression = val;
+                } else {
+                    currentExpression += val;
+                }
+                updateDisplay(currentExpression);
+
+                // Read button press aloud
+                if (voiceMap[val]) {
+                    queueVoice(voiceMap[val]);
+                }
+            }
+        }
+
+        // GUI Button bindings
+        document.querySelectorAll('.calc-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.dataset.val;
+                handleKeyPress(val);
+
+                // Add a small animation ping
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => btn.style.transform = '', 100);
+            });
+        });
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            handleKeyPress('C');
+            pendingAudio = [];
+        });
+
+        // --- STT Engine (Microphone) ---
+        let mediaRecorder;
+        let audioChunks = [];
+        const micBtn = document.getElementById('mic-btn');
+        const micStatus = document.getElementById('mic-status');
+        let isRecording = false;
+
+        async function setupMic() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    micStatus.textContent = 'Processing...';
+                    micBtn.classList.remove('recording');
+
+                    const audioBlob = new Blob(audioChunks);
+                    const formData = new FormData();
+                    formData.append('audio', audioBlob, 'record.webm');
+
+                    try {
+                        const response = await fetch('/api/stt', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            showAlert(`Heard: "${data.text}"`, 'success');
+                            executeVoiceVoiceCommand(data.text);
+                        } else {
+                            showAlert(data.error || 'STT Error', 'error');
+                        }
+                    } catch (error) {
+                        showAlert('Connection error', 'error');
+                    }
+
+                    micStatus.textContent = 'Ready';
+                    audioChunks = []; // reset
+                };
+            } catch (err) {
+                showAlert('Microphone access denied or error.', 'error');
+            }
+        }
+
+        // Single click to start, single click to stop
+        micBtn.addEventListener('click', async () => {
+            if (!mediaRecorder) await setupMic();
+            if (!mediaRecorder) return;
+
+            if (!isRecording) {
+                audioChunks = [];
+                mediaRecorder.start();
+                micBtn.classList.add('recording');
+                micStatus.textContent = 'Listening...';
+                isRecording = true;
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        });
+
+        function executeVoiceVoiceCommand(text) {
+            // Normalize and parse text into keys
+            // Remove punctuation but keep decimal points intact (only remove periods at the end of words or sentence)
+            let normalizedText = text.toLowerCase().replace(/[?,!]/g, '').replace(/\.(?=\s|$)/g, '');
+            let words = normalizedText.split(/\s+/);
+
+            let actions = [];
+            for (let word of words) {
+                if (wordToCommand[word]) actions.push(wordToCommand[word]);
+                else if (word.length === 1 && '0123456789.+-*/='.includes(word)) actions.push(word);
+                else if (symbolMap[word]) actions.push(symbolMap[word]);
+                else {
+                    for (let char of word) {
+                        if ('0123456789.+-*/='.includes(char)) actions.push(char);
+                        else if (symbolMap[char]) actions.push(symbolMap[char]);
+                    }
+                }
+            }
+
+            if (actions.length > 0) {
+                // To visually show it, let's execute them one by one like a ghost typing
+                let i = 0;
+                function pressNext() {
+                    if (i < actions.length) {
+                        handleKeyPress(actions[i]);
+                        i++;
+                        setTimeout(pressNext, 400); // 400ms interval for natural typing
+                    }
+                }
+                pressNext();
+            }
+        }
+    </script>
+</body>
+
+</html>
