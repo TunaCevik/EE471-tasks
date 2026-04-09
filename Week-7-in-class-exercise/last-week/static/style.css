@@ -1,0 +1,211 @@
+:root {
+    --bg-color: #f8fafc;
+    --surface-color: #ffffff;
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;
+    --success-bg: #d1fae5;
+    --error-color: #ef4444;
+    --error-bg: #fee2e2;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    background: var(--surface-color);
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.05);
+    padding: 2.5rem;
+    box-sizing: border-box;
+    border: 1px solid rgba(255,255,255,0.7);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--primary-color), #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+header p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.placeholder-text {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* Base Form Elements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.85rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.secondary {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+button.secondary:hover {
+    background-color: #e2e8f0;
+    box-shadow: none;
+}
+
+input[type="text"], input[type="file"], textarea, select {
+    width: 100%;
+    padding: 0.85rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    background-color: #f8fafc;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    background: none;
+    color: var(--text-muted);
+    border: none;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    width: auto;
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+    transform: none;
+    box-shadow: none;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    display: none;
+}
+
+.alert.success {
+    background-color: var(--success-bg);
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert.error {
+    background-color: var(--error-bg);
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.audio-player-container {
+    margin-top: 1.5rem;
+    background: #f1f5f9;
+    padding: 1rem;
+    border-radius: 10px;
+}
+audio {
+    width: 100%;
+}

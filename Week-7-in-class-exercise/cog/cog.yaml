@@ -1,0 +1,9 @@
+build:
+  # The version of Python your model needs
+  python_version: "3.13"
+  
+  # The file containing PyTorch and other AI libraries
+  python_requirements: "requirements.txt"
+
+# Tells Cog which class to run when a prediction is requested
+predict: "predict.py:Predictor"

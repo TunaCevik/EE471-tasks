@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 Cat Classifier</h1>
+        <p>Upload a picture of a cat, and our AI will guess the breed!</p>
+        
+        <form id="uploadForm">
+            <div class="upload-area">
+                <input type="file" id="cat_image" name="cat_image" accept="image/jpeg, image/png" required>
+            </div>
+            <button type="submit" id="submitBtn">Classify Cat</button>
+        </form>
+
+        <div id="loading" class="hidden">Analyzing image...</div>
+        
+        <div id="results" class="hidden">
+            <h2>Results:</h2>
+            <ul id="predictionsList"></ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('cat_image');
+            const resultsDiv = document.getElementById('results');
+            const predictionsList = document.getElementById('predictionsList');
+            const loadingDiv = document.getElementById('loading');
+            
+            if (fileInput.files.length === 0) return;
+
+            const formData = new FormData();
+            formData.append('cat_image', fileInput.files[0]);
+
+            // UI updates
+            resultsDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+            predictionsList.innerHTML = '';
+
+            try {
+                const response = await fetch('/classify', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Extract the output from the Cog response format
+                    const predictions = data.output;
+                    
+                    // Sort and display the top results
+                    for (const [breed, confidence] of Object.entries(predictions)) {
+                        const li = document.createElement('li');
+                        const percentage = (confidence * 100).toFixed(2);
+                        li.innerHTML = `<strong>${breed.replace('_', ' ')}</strong>: ${percentage}%`;
+                        predictionsList.appendChild(li);
+                    }
+                    resultsDiv.classList.remove('hidden');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('An error occurred during classification.');
+            } finally {
+                loadingDiv.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
