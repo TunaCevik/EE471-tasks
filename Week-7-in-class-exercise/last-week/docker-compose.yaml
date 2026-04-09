@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    # Build the image using the Dockerfile in the current directory
+    build: .
+    
+    image: my-flask-azure-app:v1.0  
+    # Map port 5000 on your host (Windows/WSL) to port 5000 in the container
+    ports:
+      - "5000:5000"
+    
+    # Automatically load variables from your .env file
+    env_file:
+      - .env
+    
+    # Optional: mount your code as a volume for "Live Reload" during development
+    volumes:
+      - ./:/app
+    
+    # Ensure the container restarts if it crashes
+    restart: always

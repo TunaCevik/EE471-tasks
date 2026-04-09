@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Speech Services</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Azure Speech Services</h1>
+            <p>Powered by Azure Cognitive Services</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-target="tts-tab">Text-to-Speech</button>
+            <button class="tab-btn" data-target="stt-tab">Speech-to-Text</button>
+        </div>
+
+        <main id="app-content">
+            <!-- TTS TAB -->
+            <div id="tts-tab" class="tab-content active">
+                <div class="form-group">
+                    <label for="tts-input">Enter text to convert to speech:</label>
+                    <textarea id="tts-input" rows="4" placeholder="Hello, EE471 class"></textarea>
+                </div>
+                <div class="form-group">
+                    <button id="btn-synthesize">🎤 Synthesize Speech</button>
+                </div>
+                
+                <div id="tts-alert" class="alert"></div>
+                
+                <div id="tts-audio-container" class="audio-player-container" style="display: none;">
+                    <label>Generated Audio:</label>
+                    <audio id="tts-audio-player" controls></audio>
+                </div>
+            </div>
+
+            <!-- STT TAB -->
+            <div id="stt-tab" class="tab-content">
+                <div class="form-group">
+                    <label for="stt-file">Upload audio to convert to text (.wav):</label>
+                    <input type="file" id="stt-file" accept=".wav">
+                </div>
+                <div class="form-group">
+                    <button id="btn-transcribe">📄 Transcribe Audio</button>
+                </div>
+                
+                <div id="stt-alert" class="alert"></div>
+                
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label>Transcription:</label>
+                    <textarea id="stt-output" rows="6" readonly placeholder="Transcription will appear here..."></textarea>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Tab Management
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.target).classList.add('active');
+            });
+        });
+
+        // TTS Logic
+        document.getElementById('btn-synthesize').addEventListener('click', async () => {
+            const text = document.getElementById('tts-input').value;
+            const alertBox = document.getElementById('tts-alert');
+            const audioContainer = document.getElementById('tts-audio-container');
+            const audioPlayer = document.getElementById('tts-audio-player');
+            const btn = document.getElementById('btn-synthesize');
+            
+            if (!text.trim()) {
+                alertBox.textContent = 'Please enter some text.';
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+                return;
+            }
+            
+            btn.textContent = 'Synthesizing...';
+            btn.disabled = true;
+            alertBox.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({text: text})
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const audioUrl = URL.createObjectURL(blob);
+                    audioPlayer.src = audioUrl;
+                    audioContainer.style.display = 'block';
+                    
+                    alertBox.textContent = '✓ Speech synthesized successfully!';
+                    alertBox.className = 'alert success';
+                    alertBox.style.display = 'block';
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Server error');
+                }
+            } catch (error) {
+                alertBox.textContent = 'Error: ' + error.message;
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+            } finally {
+                btn.textContent = '🎤 Synthesize Speech';
+                btn.disabled = false;
+            }
+        });
+
+        // STT Logic
+        document.getElementById('btn-transcribe').addEventListener('click', async () => {
+            const fileInput = document.getElementById('stt-file');
+            const alertBox = document.getElementById('stt-alert');
+            const outputArea = document.getElementById('stt-output');
+            const btn = document.getElementById('btn-transcribe');
+            
+            if (!fileInput.files.length) {
+                alertBox.textContent = 'Please select a .wav file first.';
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('audio', file);
+            
+            alertBox.textContent = 'Transcribing... please wait.';
+            alertBox.className = 'alert success';
+            alertBox.style.display = 'block';
+            outputArea.value = '';
+            
+            btn.disabled = true;
+            btn.textContent = 'Transcribing...';
+            
+            try {
+                const response = await fetch('/api/stt', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    outputArea.value = data.text;
+                    alertBox.textContent = '✓ Audio transcribed successfully!';
+                    alertBox.className = 'alert success';
+                } else {
+                    throw new Error(data.error || 'Server error');
+                }
+            } catch (error) {
+                alertBox.textContent = 'Error: ' + error.message;
+                alertBox.className = 'alert error';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📄 Transcribe Audio';
+            }
+        });
+    </script>
+</body>
+</html>

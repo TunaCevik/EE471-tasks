@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # 1. The Model Service (Built using the image Cog generated)
+  cat-model:
+    image: resnet 
+    ports:
+      - "5000:5000"
+    
+  # 2. The Web UI Service (Your Flask app)
+  web-ui:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - MODEL_API_URL=http://cat-model:5000/predictions
+    depends_on:
+      - cat-model

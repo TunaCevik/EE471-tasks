@@ -1,0 +1,88 @@
+:root {
+    --primary-color: #4CAF50;
+    --bg-color: #f4f7f6;
+    --text-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+}
+
+h1 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.upload-area {
+    margin: 1.5rem 0;
+    padding: 2rem;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.hidden {
+    display: none;
+}
+
+#loading {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #666;
+}
+
+#results {
+    margin-top: 1.5rem;
+    text-align: left;
+    background-color: #eef2f5;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+#predictionsList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#predictionsList li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    text-transform: capitalize;
+}
+
+#predictionsList li:last-child {
+    border-bottom: none;
+}
