@@ -5,6 +5,7 @@ services:
     # Build the image using the Dockerfile in the current directory
     build: .
     
+    image: my-flask-azure-app:v1.0  
     # Map port 5000 on your host (Windows/WSL) to port 5000 in the container
     ports:
       - "5000:5000"

@@ -1,0 +1,35 @@
+# General Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# PyTorch / Machine Learning
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.weights
+*.h5
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+
+# Cog
+**/.cog/
+
+# Project specific exclusions
+build_images.sh
+output.txt
+backup/

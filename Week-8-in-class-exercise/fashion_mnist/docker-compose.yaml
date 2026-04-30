@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  base-model:
+    image: fashion_mnist_base
+    ports:
+      - "5001:5000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  optimized-model:
+    image: fashion_mnist_optimized
+    ports:
+      - "5002:5000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  website:
+    build: ./website
+    ports:
+      - "8000:8000"
+    environment:
+      - BASE_MODEL_URL=http://base-model:5000/predictions
+      - OPTIMIZED_MODEL_URL=http://optimized-model:5000/predictions
+    depends_on:
+      - base-model
+      - optimized-model

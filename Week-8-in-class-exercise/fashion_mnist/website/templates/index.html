@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garment Classifier | Fashion MNIST</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Garment Classifier</h1>
+        
+        <div class="upload-card">
+            <p>Upload an image of clothing to see how our models perform.</p>
+            <form id="upload-form">
+                <div class="file-input-wrapper">
+                    <button type="button" class="btn">Choose Image</button>
+                    <input type="file" id="file-input" name="file" accept="image/*">
+                </div>
+            </form>
+            
+            <div class="preview-container" id="preview-container">
+                <img id="image-preview" src="" alt="Preview">
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing image...</p>
+            </div>
+        </div>
+
+        <div class="comparison-grid" id="comparison-grid">
+            <div class="model-card">
+                <h2>Base Model</h2>
+                <div id="base-results"></div>
+            </div>
+            <div class="model-card">
+                <h2>Optimized Model</h2>
+                <div id="optimized-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('file-input').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('preview-container').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+
+            // Show loading, hide previous results
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('comparison-grid').style.display = 'none';
+
+            // Send to server
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                renderResults(data.base, 'base-results');
+                renderResults(data.optimized, 'optimized-results');
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('comparison-grid').style.display = 'grid';
+                
+                // Animate bars
+                setTimeout(() => {
+                    document.querySelectorAll('.bar-fill').forEach(bar => {
+                        bar.style.width = bar.dataset.width;
+                    });
+                }, 100);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('An error occurred during prediction.');
+            }
+        });
+
+        function renderResults(results, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            
+            if (results.error) {
+                container.innerHTML = `<p style="color: #ef4444;">${results.error}</p>`;
+                return;
+            }
+
+            const list = document.createElement('ul');
+            list.className = 'result-list';
+            
+            // Convert to array and sort
+            const sortedResults = Object.entries(results)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+                
+            sortedResults.forEach(([label, prob], index) => {
+                const percentage = (prob * 100).toFixed(1);
+                const li = document.createElement('li');
+                li.className = `result-item ${index === 0 ? 'top' : ''}`;
+                
+                li.innerHTML = `
+                    <div class="result-label">
+                        <span>${label}</span>
+                        <span>${percentage}%</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" data-width="${percentage}%" style="width: 0%"></div>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            
+            container.appendChild(list);
+        }
+    </script>
+</body>
+</html>
