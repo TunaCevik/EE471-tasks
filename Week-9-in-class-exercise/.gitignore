@@ -1,0 +1,4 @@
+venv/
+.cog/
+__pycache__
+*.task
