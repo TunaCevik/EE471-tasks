@@ -11,42 +11,46 @@
 
 <body>
     <div class="main-container">
+        <!-- Kept your original header -->
         <header>
             <h1>Voice Activated Calculator</h1>
             <p>Speak to calculate, or press to hear</p>
         </header>
 
         <main id="app-content">
+            <!-- Updated Calculator UI to match the image -->
             <div class="calculator">
-                <div class="display" id="display">0</div>
-                <div class="keypad-container">
-                    <div class="mic-section">
-                        <button id="mic-btn" class="mic-btn" title="Hold/Click to Record">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                viewBox="0 0 16 16">
-                                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
-                                <path
-                                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
-                            </svg>
-                        </button>
-                        <div id="mic-status" class="mic-status">Ready</div>
-                    </div>
+                <div class="mic-section">
+                    <button id="mic-btn" class="mic-btn" title="Hold/Click to Record">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="black" viewBox="0 0 16 16">
+                            <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+                            <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="calc-main">
+                    <div class="display" id="display">0</div>
                     <div class="keys-section">
+                        <!-- Row 1 -->
                         <button class="calc-btn num" data-val="7">7</button>
                         <button class="calc-btn num" data-val="8">8</button>
                         <button class="calc-btn num" data-val="9">9</button>
                         <button class="calc-btn op" data-val="/">÷</button>
 
+                        <!-- Row 2 -->
                         <button class="calc-btn num" data-val="4">4</button>
                         <button class="calc-btn num" data-val="5">5</button>
                         <button class="calc-btn num" data-val="6">6</button>
                         <button class="calc-btn op" data-val="*">×</button>
 
+                        <!-- Row 3 -->
                         <button class="calc-btn num" data-val="1">1</button>
                         <button class="calc-btn num" data-val="2">2</button>
                         <button class="calc-btn num" data-val="3">3</button>
                         <button class="calc-btn op" data-val="-">−</button>
 
+                        <!-- Row 4 -->
                         <button class="calc-btn num" data-val="0">0</button>
                         <button class="calc-btn num" data-val=".">.</button>
                         <button class="calc-btn eq" data-val="=">=</button>
@@ -55,6 +59,8 @@
                 </div>
             </div>
 
+            <!-- Kept your original status and clear logic -->
+            <div id="mic-status" class="mic-status">Ready</div>
             <div id="alert-box" class="alert"></div>
 
             <div class="controls-extra">
@@ -63,6 +69,7 @@
         </main>
     </div>
 
+    <!-- YOUR EXACT ORIGINAL SCRIPT -->
     <script>
         // Data Mappings
         const voiceMap = {
@@ -195,17 +202,85 @@
             pendingAudio = [];
         });
 
+        // Physical Keyboard bindings
+        document.addEventListener('keydown', (event) => {
+            let val = null;
+            const key = event.key;
+            
+            if ('0123456789.+-'.includes(key)) val = key;
+            else if (key === '*' || key === 'x' || key === 'X') val = '*';
+            else if (key === '/') val = '/';
+            else if (key === 'Enter' || key === '=') val = '=';
+            else if (key === 'Escape' || key === 'Backspace' || key.toLowerCase() === 'c') {
+                handleKeyPress('C');
+                pendingAudio = [];
+                return;
+            }
+
+            if (val) {
+                event.preventDefault(); // Prevent default browser actions for these keys
+                // Find and animate the corresponding button
+                const btn = Array.from(document.querySelectorAll('.calc-btn')).find(b => b.dataset.val === val);
+                if (btn) {
+                    btn.style.transform = 'scale(0.9)';
+                    setTimeout(() => btn.style.transform = '', 100);
+                }
+                handleKeyPress(val);
+            }
+        });
+
         // --- STT Engine (Microphone) ---
         let mediaRecorder;
         let audioChunks = [];
         const micBtn = document.getElementById('mic-btn');
         const micStatus = document.getElementById('mic-status');
         let isRecording = false;
+        let audioContext;
+        let analyser;
+        let silenceTimer;
+        const SILENCE_THRESHOLD = 0.01; // Adjust sensitivity
+        const SILENCE_DURATION = 1500; // ms
 
         async function setupMic() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
+
+                // Setup Silence Detection
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function checkSilence() {
+                    if (!isRecording) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        sum += dataArray[i];
+                    }
+                    let average = sum / bufferLength / 255;
+
+                    if (average < SILENCE_THRESHOLD) {
+                        if (!silenceTimer) {
+                            silenceTimer = setTimeout(() => {
+                                if (isRecording) {
+                                    mediaRecorder.stop();
+                                    isRecording = false;
+                                }
+                            }, SILENCE_DURATION);
+                        }
+                    } else {
+                        if (silenceTimer) {
+                            clearTimeout(silenceTimer);
+                            silenceTimer = null;
+                        }
+                    }
+                    requestAnimationFrame(checkSilence);
+                }
 
                 mediaRecorder.ondataavailable = event => {
                     if (event.data.size > 0) {
@@ -216,6 +291,10 @@
                 mediaRecorder.onstop = async () => {
                     micStatus.textContent = 'Processing...';
                     micBtn.classList.remove('recording');
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = null;
+                    }
 
                     const audioBlob = new Blob(audioChunks);
                     const formData = new FormData();
@@ -241,14 +320,20 @@
                     micStatus.textContent = 'Ready';
                     audioChunks = []; // reset
                 };
+
+                return checkSilence;
             } catch (err) {
                 showAlert('Microphone access denied or error.', 'error');
+                return null;
             }
         }
 
-        // Single click to start, single click to stop
+        // Single click to start, auto-stops on silence
         micBtn.addEventListener('click', async () => {
-            if (!mediaRecorder) await setupMic();
+            let checkSilenceFunc;
+            if (!mediaRecorder) {
+                checkSilenceFunc = await setupMic();
+            }
             if (!mediaRecorder) return;
 
             if (!isRecording) {
@@ -257,6 +342,37 @@
                 micBtn.classList.add('recording');
                 micStatus.textContent = 'Listening...';
                 isRecording = true;
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                // Start silence detection loop
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                function loop() {
+                    if (!isRecording) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    let average = sum / bufferLength / 255;
+                    if (average < SILENCE_THRESHOLD) {
+                        if (!silenceTimer) {
+                            silenceTimer = setTimeout(() => {
+                                if (isRecording) {
+                                    mediaRecorder.stop();
+                                    isRecording = false;
+                                }
+                            }, SILENCE_DURATION);
+                        }
+                    } else {
+                        if (silenceTimer) {
+                            clearTimeout(silenceTimer);
+                            silenceTimer = null;
+                        }
+                    }
+                    requestAnimationFrame(loop);
+                }
+                loop();
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
@@ -264,8 +380,6 @@
         });
 
         function executeVoiceVoiceCommand(text) {
-            // Normalize and parse text into keys
-            // Remove punctuation but keep decimal points intact (only remove periods at the end of words or sentence)
             let normalizedText = text.toLowerCase().replace(/[?,!]/g, '').replace(/\.(?=\s|$)/g, '');
             let words = normalizedText.split(/\s+/);
 
@@ -283,13 +397,12 @@
             }
 
             if (actions.length > 0) {
-                // To visually show it, let's execute them one by one like a ghost typing
                 let i = 0;
                 function pressNext() {
                     if (i < actions.length) {
                         handleKeyPress(actions[i]);
                         i++;
-                        setTimeout(pressNext, 400); // 400ms interval for natural typing
+                        setTimeout(pressNext, 100); // 100ms interval for natural typing
                     }
                 }
                 pressNext();

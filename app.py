@@ -20,22 +20,23 @@ def text_to_speech():
         return jsonify({'error': 'No text provided'}), 400
         
     try:
+        import io
         speech_key = os.environ.get('SPEECH_KEY')
         speech_region = os.environ.get('SPEECH_REGION')
         if not speech_key or not speech_region:
             return jsonify({'error': 'Azure credentials missing.'}), 500
 
         speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
-        temp_filename = "temp_tts_output.wav"
-        audio_config = speechsdk.audio.AudioOutputConfig(filename=temp_filename)
+        speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff16Khz16BitMonoPcm)
         
         speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
-        speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+        speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
         
         result = speech_synthesizer.speak_text_async(text).get()
         
         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-            return send_file(temp_filename, mimetype="audio/wav", as_attachment=False)
+            audio_data = result.audio_data
+            return send_file(io.BytesIO(audio_data), mimetype="audio/wav", as_attachment=False, download_name="output.wav")
         else:
             return jsonify({'error': f"Speech synthesis canceled. Reason: {result.reason}"}), 500
             
