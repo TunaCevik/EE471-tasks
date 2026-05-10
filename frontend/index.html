@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboMunch - AI Artist Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <h1>ROBO <span class="accent">MUNCH</span></h1>
+            </div>
+            <div class="avatar-container">
+                <img src="image 30.png" alt="Robo Munch Avatar" class="avatar">
+            </div>
+        </header>
+
+        <!-- Art Studio Section -->
+        <section class="art-studio">
+            <h2>Art Studio</h2>
+
+            <div class="image-output-box" id="imageOutputBox">
+                <div class="placeholder-content" id="imagePlaceholder">
+                    <i class="fa-solid fa-image"></i>
+                    <p>Your artwork will appear here</p>
+                </div>
+                <img id="generatedImage" style="display: none;" alt="Generated Art">
+                <div class="loading-overlay" id="imageLoading" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <textarea id="promptInput" placeholder="Type your prompt here." rows="2"></textarea>
+                <button id="paintButton" class="icon-btn paint-btn" title="Paint">
+                    <img src="image 31.png" class="button-icon">
+                </button>
+            </div>
+        </section>
+
+        <!-- Chat Studio Section -->
+        <section class="chat-studio">
+            <h2>Chat Studio</h2>
+
+            <div class="chat-output-box" id="chatOutputBox">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+                <div class="loading-indicator" id="chatLoading" style="display: none;">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+            <div class="input-group chat-input-group">
+                <button id="voiceButton" class="icon-btn voice-btn" title="Voice Input">
+                    <img src="Mic.png">
+                </button>
+                <input type="text" id="chatInput" placeholder="Type your message here.">
+                <button id="sendButton" class="icon-btn send-btn" title="Send Message">
+                    <img src="Send.png">
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
