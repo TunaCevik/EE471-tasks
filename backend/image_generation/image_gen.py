@@ -9,7 +9,7 @@ import io
 # =========================================================================
 # True  -> Uses Pollinations.ai (Instant, Free, 0GB VRAM)
 # False -> Uses Local GTX 1650 (Slower, requires 4GB VRAM)
-USE_CLOUD_API = True
+USE_CLOUD_API = False
 
 image_pipe = None
 
@@ -18,11 +18,11 @@ def init_image_gen():
         print("Loading Image Generation Model... [CLOUD MODE: Pollinations.ai]")
     else:
         global image_pipe
-        print("Loading Image Generation Model... [LOCAL GPU MODE]")
+        print("Loading Image Generation Model... [LOCAL GPU MODE: stabilityai/sd-turbo]")
         # Using float32 avoids the NaN/black image bug on older GTX 16xx GPUs
         dtype = torch.float32
         image_pipe = StableDiffusionPipeline.from_pretrained(
-            "runwayml/stable-diffusion-v1-5", 
+            "stabilityai/sd-turbo", 
             torch_dtype=dtype,
             safety_checker=None
         )
@@ -55,8 +55,8 @@ def generate_image_from_prompt(prompt: str) -> bytes:
             if image_pipe is None:
                 raise RuntimeError("Failed to initialize image pipeline")
             
-        # Using 20 inference steps to speed up local generation
-        image = image_pipe(prompt, num_inference_steps=20).images[0]
+        # Using SD-Turbo with 1 step and 0.0 guidance scale (Takes 5-10s on GTX 1650 Ti)
+        image = image_pipe(prompt, num_inference_steps=1, guidance_scale=0.0).images[0]
         
         img_byte_arr = io.BytesIO()
         image.save(img_byte_arr, format='PNG')
