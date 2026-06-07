@@ -1,0 +1,4 @@
+django>=6.0.0
+pillow>=10.0.0
+ruff>=0.1.0
+django-cors-headers>=4.0.0

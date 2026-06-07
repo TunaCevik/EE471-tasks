@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+.pytest_cache/
+.ruff_cache/
+node_modules/
+django_app.log
+.DS_Store
+actions-runner/
+commands.txt
